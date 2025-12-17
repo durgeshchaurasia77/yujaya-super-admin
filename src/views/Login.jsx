@@ -142,6 +142,31 @@ const Login = ({ mode }) => {
   //     }
   //   }
   // }
+  // const onSubmit = async data => {
+  //   const res = await signIn('credentials', {
+  //     email: data.email,
+  //     password: data.password,
+  //     redirect: false
+  //   })
+
+  //   console.log(res)
+  //   showToast('Login successful', 'success')
+
+  //   if (res?.ok && !res?.error) {
+  //     showToast('Login successful', 'success')
+  //     console.log('>>>>>')
+  //     const redirectURL = searchParams.get('redirectTo') ?? '/'
+
+  //     router.replace(getLocalizedUrl(redirectURL, locale))
+  //   } else {
+  //     // ✅ NextAuth always returns string error codes
+  //     if (res?.error === 'CredentialsSignin') {
+  //       showToast(res?.error, 'error')
+  //     } else {
+  //       showToast('Login failed. Please try again.', 'error')
+  //     }
+  //   }
+  // }
   const onSubmit = async data => {
     const res = await signIn('credentials', {
       email: data.email,
@@ -149,22 +174,14 @@ const Login = ({ mode }) => {
       redirect: false
     })
 
-    console.log(res)
-    showToast('Login successful', 'success')
-
-    if (res?.ok && !res?.error) {
+    if (res?.ok) {
       showToast('Login successful', 'success')
-      console.log('>>>>>')
       const redirectURL = searchParams.get('redirectTo') ?? '/'
 
       router.replace(getLocalizedUrl(redirectURL, locale))
     } else {
-      // ✅ NextAuth always returns string error codes
-      if (res?.error === 'CredentialsSignin') {
-        showToast('Invalid email or password', 'error')
-      } else {
-        showToast('Login failed. Please try again.', 'error')
-      }
+      // Only possible error in CredentialsProvider
+      showToast('Invalid email or password', 'error')
     }
   }
 

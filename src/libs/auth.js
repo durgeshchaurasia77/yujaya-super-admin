@@ -25,17 +25,47 @@ export const authOptions = {
        */
       credentials: {},
       async authorize(credentials) {
-        /*
-         * You need to provide your own logic here that takes the credentials submitted and returns either
-         * an object representing a user or value that is false/null if the credentials are invalid.
-         * For e.g. return { id: 1, name: 'J Smith', email: 'jsmith@example.com' }
-         * You can also use the `req` object to obtain additional parameters (i.e., the request IP address)
-         */
         const { email, password } = credentials
 
+        if (!process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL) {
+          console.log('sdfghjk')
+
+          return
+        }
+
+        console.log(process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL)
+
+        // try {
+        //   const res = await fetch(`${process.env.API_URL_NEW}login`, {
+        //     method: 'POST',
+        //     headers: {
+        //       'Content-Type': 'application/json'
+        //     },
+        //     body: JSON.stringify({ email, password })
+        //   })
+
+        //   const data = await res.json()
+
+        //   // ❌ Invalid credentials
+        //   if (!res.ok) {
+        //     return null
+        //   }
+
+        //   // ✅ Success → return user object
+        //   return {
+        //     id: data.id,
+        //     name: data.name,
+        //     email: data.email,
+        //     role: data.role,
+        //     accessToken: data.accessToken
+        //   }
+        // } catch (error) {
+        //   // ❌ Any error → treat as invalid login
+        //   return null
+        // }
         try {
           // ** Login API Call to match the user credentials and receive user data in response along with his role
-          const res = await fetch(`${process.env.API_URL_NEW}login`, {
+          const res = await fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/login`, {
             // const res = await fetch('http://localhost:5005/api/v1/login', {
             method: 'POST',
             headers: {
@@ -45,6 +75,8 @@ export const authOptions = {
           })
 
           const data = await res.json()
+
+          console.log(data)
 
           if (res.status === 401) {
             throw new Error(JSON.stringify(data))
