@@ -174,7 +174,7 @@ const Footer = ({ mode }) => {
             <span>{`❤️`}</span>
             <span>{` by `}</span>
             <Link href='https://pixinvent.com/' target='_blank' className='font-medium text-white'>
-              Pixinvent
+              Yujaya
             </Link>
           </Typography>
           <div className='flex gap-1.5 items-center'>

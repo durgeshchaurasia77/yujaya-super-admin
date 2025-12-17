@@ -75,9 +75,12 @@ const HorizontalMenu = ({ dictionary }) => {
       >
         <SubMenu label={dictionary['navigation'].dashboards} icon={<i className='tabler-smart-home' />}>
           <MenuItem href={`/${locale}/dashboards/crm`} icon={<i className='tabler-chart-pie-2' />}>
-            {dictionary['navigation'].crm}
+            {dictionary['navigation'].dashboards}
           </MenuItem>
-          <MenuItem href={`/${locale}/dashboards/analytics`} icon={<i className='tabler-trending-up' />}>
+          {/* <MenuItem href={`/${locale}/dashboards/crm`} icon={<i className='tabler-chart-pie-2' />}>
+            {dictionary['navigation'].crm}
+          </MenuItem> */}
+          {/* <MenuItem href={`/${locale}/dashboards/analytics`} icon={<i className='tabler-trending-up' />}>
             {dictionary['navigation'].analytics}
           </MenuItem>
           <MenuItem href={`/${locale}/dashboards/ecommerce`} icon={<i className='tabler-shopping-cart' />}>
@@ -88,8 +91,14 @@ const HorizontalMenu = ({ dictionary }) => {
           </MenuItem>
           <MenuItem href={`/${locale}/dashboards/logistics`} icon={<i className='tabler-truck' />}>
             {dictionary['navigation'].logistics}
-          </MenuItem>
+          </MenuItem> */}
         </SubMenu>
+
+        <SubMenu label={'Studio'} icon={<i className='tabler-mail' />}>
+          <MenuItem href={`/${locale}/studio/list`}>{dictionary['navigation'].list}</MenuItem>
+          <MenuItem href={`/${locale}/studio/add`}>{dictionary['navigation'].add}</MenuItem>
+        </SubMenu>
+
         <SubMenu label={dictionary['navigation'].apps} icon={<i className='tabler-mail' />}>
           <SubMenu label={dictionary['navigation'].eCommerce} icon={<i className='tabler-shopping-cart' />}>
             <MenuItem href={`/${locale}/apps/ecommerce/dashboard`}>{dictionary['navigation'].dashboard}</MenuItem>
@@ -177,7 +186,7 @@ const HorizontalMenu = ({ dictionary }) => {
             <MenuItem href={`/${locale}/apps/permissions`}>{dictionary['navigation'].permissions}</MenuItem>
           </SubMenu>
         </SubMenu>
-        <SubMenu label={dictionary['navigation'].pages} icon={<i className='tabler-file' />}>
+        {/* <SubMenu label={dictionary['navigation'].pages} icon={<i className='tabler-file' />}>
           <MenuItem href={`/${locale}/pages/user-profile`} icon={<i className='tabler-user-circle' />}>
             {dictionary['navigation'].userProfile}
           </MenuItem>
@@ -295,8 +304,8 @@ const HorizontalMenu = ({ dictionary }) => {
               {dictionary['navigation'].helpCenter}
             </MenuItem>
           </SubMenu>
-        </SubMenu>
-        <SubMenu label={dictionary['navigation'].formsAndTables} icon={<i className='tabler-file-invoice' />}>
+        </SubMenu> */}
+        {/* <SubMenu label={dictionary['navigation'].formsAndTables} icon={<i className='tabler-file-invoice' />}>
           <MenuItem href={`/${locale}/forms/form-layouts`} icon={<i className='tabler-layout' />}>
             {dictionary['navigation'].formLayouts}
           </MenuItem>
@@ -325,16 +334,16 @@ const HorizontalMenu = ({ dictionary }) => {
           >
             {dictionary['navigation'].muiTables}
           </MenuItem>
-        </SubMenu>
-        <SubMenu label={dictionary['navigation'].charts} icon={<i className='tabler-chart-donut-2' />}>
+        </SubMenu> */}
+        {/* <SubMenu label={dictionary['navigation'].charts} icon={<i className='tabler-chart-donut-2' />}>
           <MenuItem href={`/${locale}/charts/apex-charts`} icon={<i className='tabler-chart-ppf' />}>
             {dictionary['navigation'].apex}
           </MenuItem>
           <MenuItem href={`/${locale}/charts/recharts`} icon={<i className='tabler-chart-sankey' />}>
             {dictionary['navigation'].recharts}
           </MenuItem>
-        </SubMenu>
-        <SubMenu label={dictionary['navigation'].others} icon={<i className='tabler-dots' />}>
+        </SubMenu> */}
+        {/* <SubMenu label={dictionary['navigation'].others} icon={<i className='tabler-dots' />}>
           <MenuItem
             icon={<i className='tabler-cards' />}
             href={`${process.env.NEXT_PUBLIC_DOCS_URL}/docs/user-interface/foundation`}
@@ -397,7 +406,7 @@ const HorizontalMenu = ({ dictionary }) => {
             </SubMenu>
           </SubMenu>
           <MenuItem disabled>{dictionary['navigation'].disabledMenu}</MenuItem>
-        </SubMenu>
+        </SubMenu> */}
       </Menu>
       {/* <Menu
           rootStyles={menuRootStyles(theme)}

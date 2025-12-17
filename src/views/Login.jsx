@@ -39,6 +39,7 @@ import { useSettings } from '@core/hooks/useSettings'
 
 // Util Imports
 import { getLocalizedUrl } from '@/utils/i18n'
+import { useToast } from '@/contexts/ToastContext'
 
 // Styled Custom Components
 const LoginIllustration = styled('img')(({ theme }) => ({
@@ -77,6 +78,7 @@ const Login = ({ mode }) => {
   // States
   const [isPasswordShown, setIsPasswordShown] = useState(false)
   const [errorState, setErrorState] = useState(null)
+  const { showToast } = useToast()
 
   // Vars
   const darkImg = '/images/pages/auth-mask-dark.png'
@@ -117,6 +119,29 @@ const Login = ({ mode }) => {
 
   const handleClickShowPassword = () => setIsPasswordShown(show => !show)
 
+  // const onSubmit = async data => {
+  //   const res = await signIn('credentials', {
+  //     email: data.email,
+  //     password: data.password,
+  //     redirect: false
+  //   })
+
+  //   if (res && res.ok && res.error === null) {
+  //     // Vars
+  //     showToast('Login successful', 'success')
+  //     const redirectURL = searchParams.get('redirectTo') ?? '/'
+
+  //     router.replace(getLocalizedUrl(redirectURL, locale))
+  //   } else {
+  //     if (res?.error) {
+  //       const error = JSON.parse(res.error)
+
+  //       showToast(error?.message?.[0] || 'Invalid credentials', 'error')
+
+  //       // setErrorState(error)
+  //     }
+  //   }
+  // }
   const onSubmit = async data => {
     const res = await signIn('credentials', {
       email: data.email,
@@ -124,16 +149,21 @@ const Login = ({ mode }) => {
       redirect: false
     })
 
-    if (res && res.ok && res.error === null) {
-      // Vars
+    console.log(res)
+    showToast('Login successful', 'success')
+
+    if (res?.ok && !res?.error) {
+      showToast('Login successful', 'success')
+      console.log('>>>>>')
       const redirectURL = searchParams.get('redirectTo') ?? '/'
 
       router.replace(getLocalizedUrl(redirectURL, locale))
     } else {
-      if (res?.error) {
-        const error = JSON.parse(res.error)
-
-        setErrorState(error)
+      // ✅ NextAuth always returns string error codes
+      if (res?.error === 'CredentialsSignin') {
+        showToast('Invalid email or password', 'error')
+      } else {
+        showToast('Login failed. Please try again.', 'error')
       }
     }
   }

@@ -20,8 +20,11 @@ import Divider from '@mui/material/Divider'
 import MenuItem from '@mui/material/MenuItem'
 import Button from '@mui/material/Button'
 
-// Third-party Imports
 import { signOut, useSession } from 'next-auth/react'
+
+import { useToast } from '@/contexts/ToastContext'
+
+// Third-party Imports
 
 // Hook Imports
 import { useSettings } from '@core/hooks/useSettings'
@@ -51,6 +54,7 @@ const UserDropdown = () => {
   const { data: session } = useSession()
   const { settings } = useSettings()
   const { lang: locale } = useParams()
+  const { showToast } = useToast()
 
   const handleDropdownOpen = () => {
     !open ? setOpen(true) : setOpen(false)
@@ -72,6 +76,7 @@ const UserDropdown = () => {
     try {
       // Sign out from the app
       await signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      showToast('Logged out successfully', 'success')
     } catch (error) {
       console.error(error)
 
