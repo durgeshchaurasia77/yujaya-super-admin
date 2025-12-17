@@ -86,9 +86,6 @@ const HorizontalMenu = ({ dictionary }) => {
           <MenuItem href={`/${locale}/dashboards/ecommerce`} icon={<i className='tabler-shopping-cart' />}>
             {dictionary['navigation'].eCommerce}
           </MenuItem>
-          <MenuItem href={`/${locale}/dashboards/academy`} icon={<i className='tabler-school' />}>
-            {dictionary['navigation'].academy}
-          </MenuItem>
           <MenuItem href={`/${locale}/dashboards/logistics`} icon={<i className='tabler-truck' />}>
             {dictionary['navigation'].logistics}
           </MenuItem> */}
