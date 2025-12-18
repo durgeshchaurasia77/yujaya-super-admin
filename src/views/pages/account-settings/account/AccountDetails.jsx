@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react'
 
-import { useSession } from 'next-auth/react'
+import { signOut, useSession } from 'next-auth/react'
 
 // MUI Imports
 import Grid from '@mui/material/Grid2'
@@ -34,6 +34,10 @@ const AccountDetails = () => {
 
   const { showToast } = useToast()
   const { data: session, status } = useSession()
+
+  if (!session?.accessToken) {
+    signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+  }
 
   const handleFormChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
@@ -82,6 +86,14 @@ const AccountDetails = () => {
       },
       body: formData
     })
+
+    if (!session?.accessToken) {
+      signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+    }
+
+    if (res.status === 406) {
+      signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+    }
 
     if (!res.ok) throw new Error('Image upload failed')
 

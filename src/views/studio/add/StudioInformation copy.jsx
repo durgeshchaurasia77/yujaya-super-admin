@@ -11,7 +11,6 @@ import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 
 import MenuItem from '@mui/material/MenuItem'
-import { Box, InputAdornment } from '@mui/material'
 
 // Third-party Imports
 import classnames from 'classnames'
@@ -44,34 +43,8 @@ const StudioInformation = ({ data, setData }) => {
     }))
   }
 
-  // const handleChange = (field, value) => {
-  //   if (field === 'userType') {
-  //     return {
-  //       ...prev,
-  //       userType: value,
-  //       gender: value === 'individual' ? prev.gender : '',
-  //       studioName: value === 'studio' ? prev.studioName : ''
-  //     }
-  //   }
-
-  //   setData(prev => ({ ...prev, [field]: value }))
-  // }
   const handleChange = (field, value) => {
-    setData(prev => {
-      if (field === 'userType') {
-        return {
-          ...prev,
-          userType: value,
-          gender: value === 'individual' ? prev.gender : '',
-          studioName: value === 'studio' ? prev.studioName : ''
-        }
-      }
-
-      return {
-        ...prev,
-        [field]: value
-      }
-    })
+    setData(prev => ({ ...prev, [field]: value }))
   }
 
   const handleRoomChange = (index, field, value) => {
@@ -315,27 +288,6 @@ const StudioInformation = ({ data, setData }) => {
 
   const [openDropdown, setOpenDropdown] = useState(false)
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0])
-  const [countries, setCountries] = useState([])
-  const [states, setStates] = useState([])
-  const [cities, setCities] = useState([])
-
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/country-list`)
-      .then(res => res.json())
-      .then(res => {
-        if (res.success) setCountries(res.data)
-      })
-  }, [])
-
-  // const handleUserTypeChange = value => {
-  //   handleChange('userType', value)
-
-  //   if (value === 'individual') {
-  //     handleChange('studioName', '')
-  //   } else {
-  //     handleChange('gender', '')
-  //   }
-  // }
 
   return (
     <Card>
@@ -346,26 +298,18 @@ const StudioInformation = ({ data, setData }) => {
             <CustomTextField
               select
               fullWidth
-              label={
-                <>
-                  User Type <span style={{ color: 'red' }}>*</span>
-                </>
-              }
+              label='User Type'
               value={data.userType}
               onChange={e => handleChange('userType', e.target.value)}
             >
-              <MenuItem value='studio'>Studio/Academy</MenuItem>
+              <MenuItem value='studio'>Studio</MenuItem>
               <MenuItem value='individual'>Individual</MenuItem>
             </CustomTextField>
           </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
               fullWidth
-              label={
-                <>
-                  First Name <span style={{ color: 'red' }}>*</span>
-                </>
-              }
+              label='First Name'
               value={data?.name}
               onChange={e => handleChange('firstName', e.target.value)}
               placeholder='Name here...'
@@ -374,11 +318,7 @@ const StudioInformation = ({ data, setData }) => {
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
               fullWidth
-              label={
-                <>
-                  Last Name <span style={{ color: 'red' }}>*</span>
-                </>
-              }
+              label='Last Name'
               value={data?.name}
               onChange={e => handleChange('lastName', e.target.value)}
               placeholder='Name here...'
@@ -387,106 +327,88 @@ const StudioInformation = ({ data, setData }) => {
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
               fullWidth
-              label={
-                <>
-                  Email Id <span style={{ color: 'red' }}>*</span>
-                </>
-              }
+              label='Email Id'
               value={data?.email}
               onChange={e => handleChange('email', e.target.value)}
               placeholder='Email here...'
             />
           </Grid>
+          {/* <Grid size={{ xs: 12, sm: 6 }}>
+            <CustomTextField
+              fullWidth
+              label='Phone No.'
+              value={data?.phoneNumber}
+              onChange={e => handleChange('phoneNumber', e.target.value)}
+              placeholder='Phone Number here...'
+            />
+          </Grid> */}
           <Grid size={{ xs: 12, sm: 6 }}>
             <label className='form-label'>
               Phone No. <span style={{ color: 'red' }}>*</span>
             </label>
 
-            <CustomTextField
-              fullWidth
-              placeholder='Phone Number here...'
-              value={data?.phoneNumber}
-              onChange={e => handleChange('phoneNumber', e.target.value)}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position='start'>
-                    <Box
-                      onClick={() => setOpenDropdown(!openDropdown)}
-                      sx={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        cursor: 'pointer',
-                        gap: 1,
-                        minWidth: 70
+            <div className='d-flex' style={{ position: 'relative' }}>
+              {/* Country Code Selector */}
+              <div
+                className='form-select me-2 d-flex align-items-center'
+                style={{ maxWidth: '100px', cursor: 'pointer' }}
+                onClick={() => setOpenDropdown(!openDropdown)}
+              >
+                <img src={`https://flagcdn.com/24x18/${selectedCountry.iso}.png`} width='24' className='me-2' alt='' />
+                {selectedCountry.label}
+              </div>
+
+              {/* Dropdown */}
+              {openDropdown && (
+                <div
+                  className='border rounded bg-white shadow-sm'
+                  style={{
+                    position: 'absolute',
+                    top: '42px',
+                    left: '0',
+                    width: '100px',
+                    zIndex: 1000,
+                    maxHeight: '200px',
+                    overflowY: 'auto'
+                  }}
+                >
+                  {countryCodes.map(cc => (
+                    <div
+                      key={cc.value}
+                      className='p-2 d-flex align-items-center'
+                      style={{ cursor: 'pointer' }}
+                      onClick={() => {
+                        setSelectedCountry(cc)
+                        setOpenDropdown(false)
                       }}
                     >
-                      <img src={`https://flagcdn.com/24x18/${selectedCountry.iso}.png`} width='24' alt='' />
-                      {selectedCountry.label}
-                    </Box>
-                  </InputAdornment>
-                )
-              }}
-            />
+                      <img src={`https://flagcdn.com/24x18/${cc.iso}.png`} width='24' className='me-2' alt='' />
+                      {cc.label}
+                    </div>
+                  ))}
+                </div>
+              )}
 
-            {/* Dropdown */}
-            {openDropdown && (
-              <Box
-                sx={{
-                  position: 'absolute',
-                  mt: 1,
-                  width: 120,
-                  maxHeight: 200,
-                  overflowY: 'auto',
-                  bgcolor: 'white',
-                  border: '1px solid #ddd',
-                  borderRadius: 1,
-                  zIndex: 1300
-                }}
-              >
-                {countryCodes.map(cc => (
-                  <Box
-                    key={cc.value}
-                    sx={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: 1,
-                      p: 1,
-                      cursor: 'pointer',
-                      '&:hover': { bgcolor: '#f5f5f5' }
-                    }}
-                    onClick={() => {
-                      setSelectedCountry(cc)
-                      setOpenDropdown(false)
-                      handleChange('countryCode', cc.label)
-                    }}
-                  >
-                    <img src={`https://flagcdn.com/24x18/${cc.iso}.png`} width='24' alt='' />
-                    {cc.label}
-                  </Box>
-                ))}
-              </Box>
-            )}
-          </Grid>
-          {data.userType === 'individual' && (
-            <Grid size={{ xs: 12, sm: 6 }}>
+              {/* Phone Input */}
+              {/* <input
+                type='tel'
+                className='form-control'
+                placeholder='Phone Number here...'
+                value={data?.phoneNumber || ''}
+                onChange={e => handleChange('phoneNumber', e.target.value)}
+                required
+              /> */}
               <CustomTextField
-                select
                 fullWidth
-                label={
-                  <>
-                    Gender <span style={{ color: 'red' }}>*</span>
-                  </>
-                }
-                value={data.gender}
-                onChange={e => handleChange('gender', e.target.value)}
-              >
-                <MenuItem value='male'>Male</MenuItem>
-                <MenuItem value='female'>Female</MenuItem>
-                <MenuItem value='other'>Other</MenuItem>
-              </CustomTextField>
-            </Grid>
-          )}
-          {/* <Grid size={{ xs: 12, sm: 6 }}>
+                label='Phone No.'
+                value={data?.phoneNumber}
+                onChange={e => handleChange('phoneNumber', e.target.value)}
+                placeholder='Phone Number here...'
+              />
+            </div>
+          </Grid>
+
+          <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
               fullWidth
               label='Studio Name'
@@ -494,23 +416,7 @@ const StudioInformation = ({ data, setData }) => {
               onChange={e => handleChange('studioName', e.target.value)}
               placeholder='Name here...'
             />
-          </Grid> */}
-          {data.userType === 'studio' && (
-            <Grid size={{ xs: 12, sm: 6 }}>
-              <CustomTextField
-                fullWidth
-                label={
-                  <>
-                    Studio Name <span style={{ color: 'red' }}>*</span>
-                  </>
-                }
-                value={data?.studioName}
-                onChange={e => handleChange('studioName', e.target.value)}
-                placeholder='Name here...'
-              />
-            </Grid>
-          )}
-
+          </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
               fullWidth
@@ -523,79 +429,32 @@ const StudioInformation = ({ data, setData }) => {
 
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
-              select
-              fullWidth
-              label='Country'
-              value={data.country}
-              onChange={e => {
-                const countryCode = e.target.value
-
-                handleChange('country', countryCode)
-                handleChange('state', '')
-                handleChange('city', '')
-
-                setCities([])
-
-                fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/states/${countryCode}`)
-                  .then(res => res.json())
-                  .then(res => {
-                    if (res.success) setStates(res.data)
-                  })
-              }}
-            >
-              {countries.map(country => (
-                <MenuItem key={country.code} value={country.code}>
-                  {country.name}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              select
-              fullWidth
-              label='State'
-              value={data.state}
-              disabled={!states.length}
-              onChange={e => {
-                const stateCode = e.target.value
-
-                handleChange('state', stateCode)
-                handleChange('city', '')
-
-                fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/cities/${data.country}/${stateCode}`)
-                  .then(res => res.json())
-                  .then(res => {
-                    if (res.success) setCities(res.data)
-                  })
-              }}
-            >
-              {states.map(state => (
-                <MenuItem key={state.code} value={state.code}>
-                  {state.name}
-                </MenuItem>
-              ))}
-            </CustomTextField>
-          </Grid>
-
-          <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              select
               fullWidth
               label='City'
-              value={data.city}
-              disabled={!cities.length}
+              value={data?.city}
               onChange={e => handleChange('city', e.target.value)}
-            >
-              {cities.map(city => (
-                <MenuItem key={city.name} value={city.name}>
-                  {city.name}
-                </MenuItem>
-              ))}
-            </CustomTextField>
+              placeholder='City here...'
+            />
+          </Grid>
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <CustomTextField
+              fullWidth
+              label='State'
+              value={data?.state}
+              onChange={e => handleChange('state', e.target.value)}
+              placeholder='State here...'
+            />
           </Grid>
 
+          <Grid size={{ xs: 12, sm: 6 }}>
+            <CustomTextField
+              fullWidth
+              label='Country'
+              value={data?.country}
+              onChange={e => handleChange('country', e.target.value)}
+              placeholder='Country here...'
+            />
+          </Grid>
           <Grid size={{ xs: 12, sm: 6 }}>
             <CustomTextField
               fullWidth
@@ -607,6 +466,43 @@ const StudioInformation = ({ data, setData }) => {
           </Grid>
         </Grid>
       </CardContent>
+      {/* <CardHeader title='Add Room:(Minimum 1 Room must be selected)' /> */}
+      {/* <CardHeader title='Add Rooms (Minimum 1 required)' action={<Button onClick={addRoom}>Add Room</Button>} />
+
+      <CardContent>
+        <Grid container spacing={6}>
+          {data.rooms.map((room, index) => (
+            <Grid key={index} size={{ xs: 12 }}>
+              <Grid container spacing={4}>
+                <Grid size={{ xs: 12, sm: 5 }}>
+                  <CustomTextField
+                    fullWidth
+                    label='Room Name'
+                    value={room.roomName}
+                    onChange={e => handleRoomChange(index, 'roomName', e.target.value)}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 5 }}>
+                  <CustomTextField
+                    fullWidth
+                    type='number'
+                    label='Pax Capacity'
+                    value={room.pax}
+                    onChange={e => handleRoomChange(index, 'pax', e.target.value)}
+                  />
+                </Grid>
+
+                <Grid size={{ xs: 12, sm: 2 }}>
+                  <Button color='error' disabled={data.rooms.length <= 1} onClick={() => removeRoom(index)}>
+                    Remove
+                  </Button>
+                </Grid>
+              </Grid>
+            </Grid>
+          ))}
+        </Grid>
+      </CardContent> */}
     </Card>
   )
 }

@@ -4,6 +4,8 @@
 import { useState } from 'react'
 
 // MUI Imports
+import { redirect } from 'next/navigation'
+
 import Card from '@mui/material/Card'
 import CardHeader from '@mui/material/CardHeader'
 import CardContent from '@mui/material/CardContent'
@@ -12,25 +14,90 @@ import InputAdornment from '@mui/material/InputAdornment'
 import IconButton from '@mui/material/IconButton'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
+import { signOut, useSession } from 'next-auth/react'
+import { getServerSession } from 'next-auth'
+
+import { useToast } from '@/contexts/ToastContext'
 
 //Component Imports
 import CustomTextField from '@core/components/mui/TextField'
 
+const initialData = {
+  currentPassword: '',
+  password: '',
+  confirmPassword: ''
+}
+
 const ChangePasswordCard = () => {
+  const [formData, setFormData] = useState(initialData)
+  const { data: session, status } = useSession()
+
   // States
   const [isCurrentPasswordShown, setIsCurrentPasswordShown] = useState(false)
   const [isConfirmPasswordShown, setIsConfirmPasswordShown] = useState(false)
   const [isNewPasswordShown, setIsNewPasswordShown] = useState(false)
+  const { showToast } = useToast()
+
+  if (status === 'loading') return null
+
+  if (!session?.accessToken) {
+    signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+  }
+
+  const handleFormChange = (field, value) => {
+    setFormData(prev => ({ ...prev, [field]: value }))
+  }
 
   const handleClickShowCurrentPassword = () => {
     setIsCurrentPasswordShown(!isCurrentPasswordShown)
+  }
+
+  const handleChangeSubmit = async e => {
+    e.preventDefault()
+
+    // alert('fghjkl')
+
+    try {
+      const res = await fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/changePassword`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${session.accessToken}`
+        },
+        body: JSON.stringify(formData)
+      })
+
+      if (!session?.accessToken) {
+        signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      }
+
+      const data = await res.json()
+
+      // console.log(data)
+
+      if (res.status === 406) {
+        signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      }
+
+      if (data.status == 200) {
+        showToast('Password Changed successfully', 'success')
+      } else {
+        showToast(data.message, 'error')
+      }
+
+      // if (!res.ok) throw new Error('Failed to change password')
+    } catch (error) {
+      signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+
+      // showToast(error.message || 'Something went wrong', 'error')
+    }
   }
 
   return (
     <Card>
       <CardHeader title='Change Password' />
       <CardContent>
-        <form>
+        <form onSubmit={handleChangeSubmit}>
           <Grid container spacing={6}>
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField
@@ -38,6 +105,8 @@ const ChangePasswordCard = () => {
                 label='Current Password'
                 type={isCurrentPasswordShown ? 'text' : 'password'}
                 placeholder='············'
+                value={formData.currentPassword}
+                onChange={e => handleFormChange('currentPassword', e.target.value)}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -63,6 +132,8 @@ const ChangePasswordCard = () => {
                 label='New Password'
                 type={isNewPasswordShown ? 'text' : 'password'}
                 placeholder='············'
+                value={formData.password}
+                onChange={e => handleFormChange('password', e.target.value)}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -86,6 +157,8 @@ const ChangePasswordCard = () => {
                 label='Confirm New Password'
                 type={isConfirmPasswordShown ? 'text' : 'password'}
                 placeholder='············'
+                value={formData.confirmPassword}
+                onChange={e => handleFormChange('confirmPassword', e.target.value)}
                 slotProps={{
                   input: {
                     endAdornment: (
@@ -110,19 +183,25 @@ const ChangePasswordCard = () => {
                   <i className='tabler-circle-filled text-[8px]' />
                   Minimum 8 characters long - the more, the better
                 </div>
-                <div className='flex items-center gap-2.5'>
+                {/* <div className='flex items-center gap-2.5'>
                   <i className='tabler-circle-filled text-[8px]' />
                   At least one lowercase & one uppercase character
                 </div>
                 <div className='flex items-center gap-2.5'>
                   <i className='tabler-circle-filled text-[8px]' />
                   At least one number, symbol, or whitespace character
-                </div>
+                </div> */}
               </div>
             </Grid>
             <Grid size={{ xs: 12 }} className='flex gap-4'>
-              <Button variant='contained'>Save Changes</Button>
+              {/* <Button variant='contained'>Save Changes</Button>
               <Button variant='tonal' type='reset' color='secondary'>
+                Reset
+              </Button> */}
+              <Button type='submit' variant='contained'>
+                Save Changes
+              </Button>
+              <Button variant='tonal' color='secondary' onClick={() => setFormData(initialData)}>
                 Reset
               </Button>
             </Grid>

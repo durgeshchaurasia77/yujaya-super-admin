@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 
 import Grid from '@mui/material/Grid2'
 
-// import { signOut } from 'next-auth/react'
+import { signOut } from 'next-auth/react'
 
 // import { redirect } from 'next/navigation'
 // Next Auth
@@ -19,10 +19,10 @@ const eCommerceStudiosList = async () => {
   const session = await getServerSession(authOptions)
 
   if (!session?.accessToken) {
-    redirect('/en/login')
+    signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
   }
 
-  console.log(session.accessToken)
+  // console.log(session.accessToken)
 
   const res = await fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/studios`, {
     headers: {
@@ -31,11 +31,11 @@ const eCommerceStudiosList = async () => {
     cache: 'no-store'
   })
 
-  console.log(res)
+  // console.log(res)
 
   if (!res.ok) {
     if (res.status === 406) {
-      redirect('/en/login')
+      signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
     }
 
     const text = await res.text()

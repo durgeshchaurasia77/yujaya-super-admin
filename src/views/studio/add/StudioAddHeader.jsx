@@ -13,11 +13,11 @@ const StudioAddHeader = ({ onPublish }) => {
 
       <div className='flex gap-4'>
         <Button variant='tonal' color='secondary' href={`/${locale}/studio/list`}>
-          Discard
+          Cancel
         </Button>
         {/* <Button variant='tonal'>Save Draft</Button> */}
         <Button variant='contained' onClick={onPublish}>
-          Publish Studio
+          Submit
         </Button>
       </div>
     </div>

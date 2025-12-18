@@ -91,9 +91,9 @@ const HorizontalMenu = ({ dictionary }) => {
           </MenuItem> */}
         </SubMenu>
 
-        <SubMenu label={'Studio'} icon={<i className='tabler-mail' />}>
-          <MenuItem href={`/${locale}/studio/list`}>{dictionary['navigation'].list}</MenuItem>
-          <MenuItem href={`/${locale}/studio/add`}>{dictionary['navigation'].add}</MenuItem>
+        <SubMenu label={'Studio Management'} icon={<i className='tabler-mail' />}>
+          <MenuItem href={`/${locale}/studio/add`}>{dictionary['navigation'].add} Studio</MenuItem>
+          <MenuItem href={`/${locale}/studio/list`}>Studio {dictionary['navigation'].list}</MenuItem>
         </SubMenu>
 
         {/* <SubMenu label={dictionary['navigation'].apps} icon={<i className='tabler-mail' />}>

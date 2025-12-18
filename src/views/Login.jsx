@@ -45,7 +45,7 @@ import { useToast } from '@/contexts/ToastContext'
 const LoginIllustration = styled('img')(({ theme }) => ({
   zIndex: 2,
   blockSize: 'auto',
-  maxBlockSize: 680,
+  maxBlockSize: 500,
   maxInlineSize: '100%',
   margin: theme.spacing(12),
   [theme.breakpoints.down(1536)]: {
@@ -207,12 +207,12 @@ const Login = ({ mode }) => {
             <Typography variant='h4'>{`Welcome to ${themeConfig.templateName}! 👋🏻`}</Typography>
             <Typography>Please sign-in to your account and start the adventure</Typography>
           </div>
-          <Alert icon={false} className='bg-[var(--mui-palette-primary-lightOpacity)]'>
+          {/* <Alert icon={false} className='bg-[var(--mui-palette-primary-lightOpacity)]'>
             <Typography variant='body2' color='primary.main'>
               Email: <span className='font-medium'>admin@vuexy.com</span> / Pass:{' '}
               <span className='font-medium'>admin</span>
             </Typography>
-          </Alert>
+          </Alert> */}
           <form
             noValidate
             autoComplete='off'
@@ -280,25 +280,25 @@ const Login = ({ mode }) => {
             />
             <div className='flex justify-between items-center gap-x-3 gap-y-1 flex-wrap'>
               <FormControlLabel control={<Checkbox defaultChecked />} label='Remember me' />
-              <Typography
+              {/* <Typography
                 className='text-end'
                 color='primary.main'
                 component={Link}
                 href={getLocalizedUrl('/forgot-password', locale)}
               >
                 Forgot password?
-              </Typography>
+              </Typography> */}
             </div>
             <Button fullWidth variant='contained' type='submit'>
               Login
             </Button>
-            <div className='flex justify-center items-center flex-wrap gap-2'>
+            {/* <div className='flex justify-center items-center flex-wrap gap-2'>
               <Typography>New on our platform?</Typography>
               <Typography component={Link} href={getLocalizedUrl('/register', locale)} color='primary.main'>
                 Create an account
               </Typography>
-            </div>
-            <Divider className='gap-2'>or</Divider>
+            </div> */}
+            {/* <Divider className='gap-2'>or</Divider>
             <Button
               color='secondary'
               className='self-center text-textPrimary'
@@ -307,7 +307,7 @@ const Login = ({ mode }) => {
               onClick={() => signIn('google')}
             >
               Sign in with Google
-            </Button>
+            </Button> */}
           </form>
         </div>
       </div>

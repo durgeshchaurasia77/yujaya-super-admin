@@ -21,6 +21,10 @@ import IconButton from '@mui/material/IconButton'
 import MenuItem from '@mui/material/MenuItem'
 import TablePagination from '@mui/material/TablePagination'
 import Typography from '@mui/material/Typography'
+import Dialog from '@mui/material/Dialog'
+import DialogTitle from '@mui/material/DialogTitle'
+import DialogContent from '@mui/material/DialogContent'
+import DialogActions from '@mui/material/DialogActions'
 
 // Tanstack Table
 import {
@@ -69,6 +73,8 @@ const StudioListTable = ({ studioData = [] }) => {
   const [data, setData] = useState(studioData)
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
+  const [openView, setOpenView] = useState(false)
+  const [selectedStudio, setSelectedStudio] = useState(null)
 
   // 🔐 Auto logout if session expired
   if (status === 'unauthenticated') {
@@ -187,23 +193,16 @@ const StudioListTable = ({ studioData = [] }) => {
       }),
       columnHelper.accessor('userType', {
         header: 'User Type',
-        cell: ({ row }) => <Typography>{row.original.userType}</Typography>
-      }),
-
-      columnHelper.accessor('city', {
-        header: 'Location',
         cell: ({ row }) => (
           <Typography>
-            {row.original.city}, {row.original.state}, {row.original.country}
+            {row.original.userType === 'individual'
+              ? 'Individual'
+              : row.original.userType === 'studio'
+                ? 'Studio/Academy'
+                : '-'}
           </Typography>
         )
       }),
-
-      columnHelper.accessor('rooms', {
-        header: 'Rooms',
-        cell: ({ row }) => <Typography>{Array.isArray(row.original.rooms) ? row.original.rooms.length : 0}</Typography>
-      }),
-
       columnHelper.accessor('status', {
         header: 'Status',
         cell: ({ row }) => (
@@ -221,32 +220,6 @@ const StudioListTable = ({ studioData = [] }) => {
         header: 'Actions',
         cell: ({ row }) => (
           <div className='flex items-center gap-2'>
-            {/* <IconButton component={Link} href={`/${locale}/studio/${row.original._id}/edit`}>
-              <i className='tabler-edit text-textSecondary' />
-            </IconButton> */}
-
-            {/* <OptionMenu
-              options={[
-                {
-                  text: 'Delete',
-                  icon: 'tabler-trash',
-                  menuItemProps: {
-                    onClick: () => setData(prev => prev.filter(s => s._id !== row.original._id))
-                  }
-                }
-              ]}
-            /> */}
-            {/* <OptionMenu
-              options={[
-                {
-                  text: 'Delete',
-                  icon: 'tabler-trash',
-                  menuItemProps: {
-                    onClick: () => handleDeleteStudio(row.original._id)
-                  }
-                }
-              ]}
-            /> */}
             <OptionMenu
               options={[
                 {
@@ -254,6 +227,16 @@ const StudioListTable = ({ studioData = [] }) => {
                   icon: row.original.status === 'active' ? 'tabler-lock' : 'tabler-check',
                   menuItemProps: {
                     onClick: () => handleToggleStatus(row.original._id, row.original.status)
+                  }
+                },
+                {
+                  text: 'View',
+                  icon: 'tabler-eye',
+                  menuItemProps: {
+                    onClick: () => {
+                      setSelectedStudio(row.original)
+                      setOpenView(true)
+                    }
                   }
                 },
                 {
@@ -298,7 +281,7 @@ const StudioListTable = ({ studioData = [] }) => {
   // ---------- UI ----------
   return (
     <Card>
-      <CardHeader title='Studios' />
+      <CardHeader title='All Studio' />
       <Divider />
 
       <div className='flex flex-wrap justify-between gap-4 p-6'>
@@ -369,6 +352,77 @@ const StudioListTable = ({ studioData = [] }) => {
         page={table.getState().pagination.pageIndex}
         onPageChange={(_, page) => table.setPageIndex(page)}
       />
+      <Dialog open={openView} onClose={() => setOpenView(false)} fullWidth maxWidth='sm'>
+        <DialogTitle>Studio Details</DialogTitle>
+
+        <DialogContent dividers>
+          {selectedStudio && (
+            <div className='flex flex-col gap-3'>
+              <Typography>
+                <strong>First Name:</strong> {selectedStudio.firstName}
+              </Typography>
+              <Typography>
+                <strong>Owner Name:</strong> {selectedStudio.lastName}
+              </Typography>
+
+              {/* <Typography>
+                <strong>Studio Name:</strong> {selectedStudio.studioName || '-'}
+              </Typography> */}
+
+              <Typography>
+                <strong>Email:</strong> {selectedStudio.email || '-'}
+              </Typography>
+
+              <Typography>
+                <strong>Phone:</strong> {selectedStudio.phoneNumber || '-'}
+              </Typography>
+              {selectedStudio?.gender && (
+                <Typography>
+                  <strong>Gender:</strong> {selectedStudio.gender}
+                </Typography>
+              )}
+
+              {selectedStudio?.studioName && (
+                <Typography>
+                  <strong>Studio Name:</strong> {selectedStudio.studioName}
+                </Typography>
+              )}
+
+              <Typography>
+                <strong>User Type:</strong> {selectedStudio.userType === 'individual' ? 'Individual' : 'Studio/Academy'}
+              </Typography>
+              <Typography>
+                <strong>Address:</strong> {selectedStudio.address || '-'}
+              </Typography>
+              <Typography>
+                <strong>City:</strong> {selectedStudio.city || '-'}
+              </Typography>
+              <Typography>
+                <strong>State:</strong> {selectedStudio.state || '-'}
+              </Typography>
+              <Typography>
+                <strong>Country:</strong> {selectedStudio.country || '-'}
+              </Typography>
+              <Typography>
+                <strong>Zip code:</strong> {selectedStudio.zipcode || '-'}
+              </Typography>
+
+              <Typography>
+                <strong>Status:</strong>{' '}
+                <Chip
+                  size='small'
+                  label={selectedStudio.status}
+                  color={selectedStudio.status === 'active' ? 'success' : 'warning'}
+                />
+              </Typography>
+            </div>
+          )}
+        </DialogContent>
+
+        <DialogActions>
+          <Button onClick={() => setOpenView(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
     </Card>
   )
 }
