@@ -203,6 +203,23 @@ const StudioListTable = ({ studioData = [] }) => {
           </Typography>
         )
       }),
+      columnHelper.accessor('isPaid', {
+        header: 'Payment Status',
+        cell: ({ row }) => {
+          const isPaid = row.original.isPaid
+
+          return (
+            <Typography
+              sx={{
+                color: isPaid === true ? 'success.main' : isPaid === false ? 'warning.main' : 'text.secondary',
+                fontWeight: 600
+              }}
+            >
+              {isPaid === true ? 'Done' : isPaid === false ? 'Pending' : '-'}
+            </Typography>
+          )
+        }
+      }),
       columnHelper.accessor('status', {
         header: 'Status',
         cell: ({ row }) => (

@@ -2,6 +2,8 @@
 import Grid from '@mui/material/Grid2'
 
 // Component Imports
+import { getServerSession } from 'next-auth'
+
 import DistributedBarChartOrder from '@views/dashboards/crm/DistributedBarChartOrder'
 import LineAreaYearlySalesChart from '@views/dashboards/crm/LineAreaYearlySalesChart'
 import CardStatVertical from '@/components/card-statistics/Vertical'
@@ -14,11 +16,19 @@ import ActiveProjects from '@views/dashboards/crm/ActiveProjects'
 import LastTransaction from '@views/dashboards/crm/LastTransaction'
 import ActivityTimeline from '@views/dashboards/crm/ActivityTimeline'
 
-// Server Action Imports
+import { authOptions } from '@/libs/auth'
+
 import { getServerMode } from '@core/utils/serverHelpers'
 
 const DashboardCRM = async () => {
   // Vars
+
+  const session = await getServerSession(authOptions)
+
+  if (!session?.accessToken) {
+    signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+  }
+
   const serverMode = await getServerMode()
 
   return (

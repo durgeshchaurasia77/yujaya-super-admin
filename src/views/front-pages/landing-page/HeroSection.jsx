@@ -23,6 +23,7 @@ import frontCommonStyles from '@views/front-pages/styles.module.css'
 const HeroSection = ({ mode }) => {
   // States
   const [transform, setTransform] = useState('')
+  const [mounted, setMounted] = useState(false)
 
   // Vars
   const dashboardImageLight = '/images/front-pages/landing-page/hero-dashboard-light.png'
@@ -38,7 +39,16 @@ const HeroSection = ({ mode }) => {
   const elementsImage = useImageVariant(mode, elementsImageLight, elementsImageDark)
   const heroSectionBg = useImageVariant(mode, heroSectionBgLight, heroSectionBgDark)
   const _mode = (muiMode === 'system' ? mode : muiMode) || mode
-  const isAboveLgScreen = useMediaQuery(theme => theme.breakpoints.up('lg'))
+
+  // const isAboveLgScreen = useMediaQuery(theme => theme.breakpoints.up('lg'))
+
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+
+  const isAboveLgScreen = useMediaQuery(theme => theme.breakpoints.up('lg'), { noSsr: true })
+
+  if (!mounted) return null
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
