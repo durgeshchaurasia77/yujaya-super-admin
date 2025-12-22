@@ -22,7 +22,10 @@ import CustomTextField from '@core/components/mui/TextField'
 const initialData = {
   name: '',
   email: '',
-  phone: ''
+  phone: '',
+  bankName: '',
+  accountNumber: '',
+  ifscCode: ''
 }
 
 const AccountDetails = () => {
@@ -42,17 +45,6 @@ const AccountDetails = () => {
   const handleFormChange = (field, value) => {
     setFormData(prev => ({ ...prev, [field]: value }))
   }
-
-  // const handleFileInputChange = e => {
-  //   const reader = new FileReader()
-  //   const { files } = e.target
-
-  //   if (files?.length) {
-  //     reader.onload = () => setImgSrc(reader.result)
-  //     reader.readAsDataURL(files[0])
-  //     setFileInput(files[0])
-  //   }
-  // }
 
   const handleFileInputChange = e => {
     const file = e.target.files?.[0]
@@ -116,16 +108,22 @@ const AccountDetails = () => {
           }
         })
 
+        // console.log('>>>>', res)
         if (!res.ok) throw new Error('Failed to load profile')
 
-        const data = await res.json()
+        if (res.status === 406) {
+          signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+        }
 
-        console.log('PROFILE >>>>', data)
+        const data = await res.json()
 
         setFormData({
           name: data.name || '',
           email: data.email || '',
-          phone: data.phone || ''
+          phone: data.phone || '',
+          bankName: data.bankName || '',
+          accountNumber: data.accountNumber || '',
+          ifscCode: data.ifscCode || ''
         })
 
         if (data.avatarUrl) {
@@ -156,6 +154,10 @@ const AccountDetails = () => {
         },
         body: JSON.stringify(formData)
       })
+
+      if (res.status === 406) {
+        signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      }
 
       if (!res.ok) throw new Error('Failed to update profile')
 
@@ -217,6 +219,30 @@ const AccountDetails = () => {
                 label='Phone Number'
                 value={formData.phone}
                 onChange={e => handleFormChange('phone', e.target.value)}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Bank Name'
+                value={formData.bankName}
+                onChange={e => handleFormChange('bankName', e.target.value)}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='Account Number'
+                value={formData.accountNumber}
+                onChange={e => handleFormChange('accountNumber', e.target.value)}
+              />
+            </Grid>
+            <Grid size={{ xs: 12, sm: 6 }}>
+              <CustomTextField
+                fullWidth
+                label='IFSC Code'
+                value={formData.ifscCode}
+                onChange={e => handleFormChange('ifscCode', e.target.value)}
               />
             </Grid>
 
