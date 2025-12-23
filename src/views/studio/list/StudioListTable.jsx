@@ -47,7 +47,7 @@ import classnames from 'classnames'
 
 import { getServerSession } from 'next-auth'
 
-import { updateStudioStatus, getStudioById, updateStudio, deleteStudio } from '@/libs/studios.api'
+import { updateStudioStatus, getStudioById, updateStudio, deleteStudio, getPlanHistoryById } from '@/libs/studios.api'
 
 // Toast
 import { useToast } from '@/contexts/ToastContext'
@@ -86,6 +86,7 @@ const StudioListTable = ({ studioData = [] }) => {
   const [rowSelection, setRowSelection] = useState({})
   const [globalFilter, setGlobalFilter] = useState('')
   const [openView, setOpenView] = useState(false)
+  const [openPlanHistory, setOpenPlanHistory] = useState(false)
   const [openEdit, setOpenEdit] = useState(false)
   const [selectedStudio, setSelectedStudio] = useState(null)
   const [tableData, setTableData] = useState([])
@@ -469,6 +470,29 @@ const StudioListTable = ({ studioData = [] }) => {
     }
   }
 
+  const handlePlanHistoryOpen = async studioId => {
+    try {
+      if (!session?.accessToken) {
+        signOut({ callbackUrl: `/${locale}/login` })
+
+        return
+      }
+
+      const res = await getPlanHistoryById(studioId, session.accessToken)
+      const { studio, plans } = res.data
+
+      setSelectedStudio({
+        ...studio,
+        plans
+      })
+
+      setOpenPlanHistory(true)
+    } catch (error) {
+      console.log(error)
+      showToast('Failed to load plan history', 'error')
+    }
+  }
+
   const handleChange = (field, value) => {
     setFormData(prev => ({
       ...prev,
@@ -476,32 +500,6 @@ const StudioListTable = ({ studioData = [] }) => {
     }))
   }
 
-  // const handleUpdate = async () => {
-  //   if (!session?.accessToken) {
-  //     signOut({ callbackUrl: `/${locale}/login` })
-
-  //     return
-  //   }
-
-  //   try {
-  //     const result = await updateStudio(selectedStudio._id, formData, session.accessToken)
-
-  //     // setTableData(prev => prev.map(item => (item._id === selectedStudio._id ? { ...item, ...result.data } : item)))
-  //     setData(prev => prev.map(item => (item._id === selectedStudio._id ? { ...item, ...result.data } : item)))
-  //     showToast('Updated successfully', 'success')
-  //     setOpenEdit(false)
-  //     setSelectedStudio(null)
-
-  //     setTimeout(() => {
-  //       router.replace(`/${locale}/studio/list`)
-  //       router.refresh()
-  //     }, 2000)
-
-  //     // window.location.reload()
-  //   } catch (error) {
-  //     showToast(error.message || 'Update failed', 'error')
-  //   }
-  // }
   const handleUpdate = async () => {
     if (!session?.accessToken) {
       signOut({ callbackUrl: `/${locale}/login` })
@@ -713,6 +711,16 @@ const StudioListTable = ({ studioData = [] }) => {
                   }
                 },
                 {
+                  text: 'Plan History',
+                  icon: 'tabler-eye',
+                  menuItemProps: {
+                    onClick: () => {
+                      handlePlanHistoryOpen(row.original._id)
+                      setOpenPlanHistory(true)
+                    }
+                  }
+                },
+                {
                   text: 'Delete',
                   icon: 'tabler-trash',
                   menuItemProps: {
@@ -826,7 +834,7 @@ const StudioListTable = ({ studioData = [] }) => {
         onPageChange={(_, page) => table.setPageIndex(page)}
       />
       <Dialog open={openView} onClose={() => setOpenView(false)} fullWidth maxWidth='sm'>
-        <DialogTitle>Studio Details</DialogTitle>
+        <DialogTitle>Individual/Studio Details</DialogTitle>
 
         <DialogContent dividers>
           {selectedStudio && (
@@ -894,8 +902,69 @@ const StudioListTable = ({ studioData = [] }) => {
           <Button onClick={() => setOpenView(false)}>Close</Button>
         </DialogActions>
       </Dialog>
+      <Dialog open={openPlanHistory} onClose={() => setOpenPlanHistory(false)} fullWidth maxWidth='sm'>
+        <DialogTitle>Individual/Studio Plan History</DialogTitle>
+
+        <DialogContent dividers>
+          {selectedStudio?.plans?.length > 0 ? (
+            <Box sx={{ mt: 3 }}>
+              <Typography variant='h6' gutterBottom>
+                Plan History
+              </Typography>
+
+              {selectedStudio.plans.map((plan, index) => (
+                <Box
+                  key={plan._id}
+                  sx={{
+                    p: 2,
+                    mb: 2,
+                    border: '1px solid #e0e0e0',
+                    borderRadius: 2,
+                    backgroundColor: '#fafafa'
+                  }}
+                >
+                  <Typography variant='subtitle1'>
+                    <strong>
+                      {index + 1}. {plan.title}
+                    </strong>
+                  </Typography>
+
+                  {plan.subtitle && (
+                    <Typography variant='body2' color='text.secondary'>
+                      {plan.subtitle}
+                    </Typography>
+                  )}
+
+                  <Typography>
+                    <strong>Billing Type:</strong> {plan.billingType}
+                  </Typography>
+
+                  <Typography>
+                    <strong>Amount:</strong> ${plan.amount}
+                  </Typography>
+
+                  <Typography>
+                    <strong>Payment Mode:</strong> {paymentModeLabel[plan.paymentMode]}
+                  </Typography>
+
+                  <Typography>
+                    <strong>Purchased On:</strong> {new Date(plan.createdAt).toLocaleDateString('en-GB')}
+                  </Typography>
+                </Box>
+              ))}
+            </Box>
+          ) : (
+            <Typography sx={{ mt: 2 }} color='text.secondary'>
+              No plan history available
+            </Typography>
+          )}
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenPlanHistory(false)}>Close</Button>
+        </DialogActions>
+      </Dialog>
       <Dialog open={openEdit} onClose={() => setOpenEdit(false)} fullWidth maxWidth='md'>
-        <DialogTitle>Edit User / Studio</DialogTitle>
+        <DialogTitle>Edit Individual / Studio</DialogTitle>
 
         <DialogContent dividers>
           <CardContent>
@@ -1000,35 +1069,6 @@ const StudioListTable = ({ studioData = [] }) => {
                   onChange={e => handleChange('address', e.target.value)}
                 />
               </Grid>
-              {/* <Grid size={{ xs: 12, sm: 6 }}>
-                <CustomTextField
-                  select
-                  fullWidth
-                  label='Country'
-                  value={formData.country}
-                  onChange={e => {
-                    const countryCode = e.target.value
-
-                    handleChange('country', countryCode)
-                    handleChange('state', '')
-                    handleChange('city', '')
-
-                    setCities([])
-
-                    fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/states/${countryCode}`)
-                      .then(res => res.json())
-                      .then(res => {
-                        if (res.success) setStates(res.data)
-                      })
-                  }}
-                >
-                  {countries.map(country => (
-                    <MenuItem key={country.code} value={country.code}>
-                      {country.name}
-                    </MenuItem>
-                  ))}
-                </CustomTextField>
-              </Grid> */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <CustomTextField
                   select
@@ -1060,31 +1100,6 @@ const StudioListTable = ({ studioData = [] }) => {
                 </CustomTextField>
               </Grid>
               <Grid size={{ xs: 12, sm: 6 }}>
-                {/* <CustomTextField
-                  select
-                  fullWidth
-                  label='State'
-                  value={formData.state}
-                  disabled={!states.length}
-                  onChange={e => {
-                    const stateCode = e.target.value
-
-                    handleChange('state', stateCode)
-                    handleChange('city', '')
-
-                    fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/cities/${formData.country}/${stateCode}`)
-                      .then(res => res.json())
-                      .then(res => {
-                        if (res.success) setCities(res.data)
-                      })
-                  }}
-                >
-                  {states.map(state => (
-                    <MenuItem key={state.code} value={state.code}>
-                      {state.name}
-                    </MenuItem>
-                  ))}
-                </CustomTextField> */}
                 <CustomTextField
                   select
                   fullWidth
@@ -1113,20 +1128,6 @@ const StudioListTable = ({ studioData = [] }) => {
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                {/* <CustomTextField
-                  select
-                  fullWidth
-                  label='City'
-                  value={formData.city}
-                  disabled={!cities.length}
-                  onChange={e => handleChange('city', e.target.value)}
-                >
-                  {cities.map(city => (
-                    <MenuItem key={city.name} value={city.name}>
-                      {city.name}
-                    </MenuItem>
-                  ))}
-                </CustomTextField> */}
                 <CustomTextField
                   select
                   fullWidth

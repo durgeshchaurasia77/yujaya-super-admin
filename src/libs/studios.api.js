@@ -13,10 +13,6 @@ export const updateStudioStatus = (studioId, status, token) => {
 }
 
 export const getStudioById = (studioId, token) => {
-  console.log(token)
-
-  // stop
-
   return apiClient(`${BASE_URL}/studio/${studioId}`, {
     method: 'GET',
     headers: {
@@ -39,6 +35,15 @@ export const updateStudio = (id, payload, token) => {
 export const deleteStudio = (studioId, token) => {
   return apiClient(`${BASE_URL}/studios/${studioId}`, {
     method: 'DELETE',
+    headers: {
+      Authorization: `Bearer ${token}`
+    }
+  })
+}
+
+export const getPlanHistoryById = (studioId, token) => {
+  return apiClient(`${BASE_URL}/studioPlanHistory/${studioId}`, {
+    method: 'GET',
     headers: {
       Authorization: `Bearer ${token}`
     }
