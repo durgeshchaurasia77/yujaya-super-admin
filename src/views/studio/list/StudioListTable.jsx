@@ -360,25 +360,62 @@ const StudioListTable = ({ studioData = [] }) => {
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0])
   const [openDropdown, setOpenDropdown] = useState(false)
 
+  // const handleEditOpen = async studioId => {
+  //   try {
+  //     if (!session?.accessToken) {
+  //       signOut({ callbackUrl: `/${locale}/login` })
+
+  //       return
+  //     }
+
+  //     const res = await getStudioById(studioId, session.accessToken)
+
+  //     // const studio = res.data
+  //     const { studio, plan } = res.data
+
+  //     console.log(plan)
+
+  //     // setSelectedStudio(studio)
+  //     setSelectedStudio({
+  //       ...studio,
+  //       plan
+  //     })
+
+  //     setFormData({
+  //       userType: studio.userType || '',
+  //       firstName: studio.firstName || '',
+  //       lastName: studio.lastName || '',
+  //       email: studio.email || '',
+  //       phoneNumber: studio.phoneNumber || '',
+  //       countryCode: studio.countryCode || '',
+  //       gender: studio.gender || '',
+  //       isPaid: String(!!studio.isPaid),
+  //       studioName: studio.studioName || '',
+  //       address: studio.address || '',
+  //       country: studio.country || '',
+  //       state: studio.state || '',
+  //       city: studio.city || '',
+  //       zipcode: studio.zipcode || '',
+  //       paymentMode: studio.plan?.paymentMode || ''
+  //     })
+
+  //     setOpenEdit(true)
+  //   } catch (error) {
+  //     showToast(error.message || 'Failed to load studio', 'error')
+  //   }
+  // }
   const handleEditOpen = async studioId => {
+    if (!session?.accessToken) {
+      signOut({ callbackUrl: `/${locale}/login` })
+
+      return
+    }
+
     try {
-      if (!session?.accessToken) {
-        return <AutoLogout />
-      }
-
       const res = await getStudioById(studioId, session.accessToken)
-
-      // const studio = res.data
       const { studio, plan } = res.data
 
-      console.log(plan)
-
-      // setSelectedStudio(studio)
-      setSelectedStudio({
-        ...studio,
-        plan
-      })
-
+      setSelectedStudio({ ...studio, plan })
       setFormData({
         userType: studio.userType || '',
         firstName: studio.firstName || '',
@@ -393,8 +430,7 @@ const StudioListTable = ({ studioData = [] }) => {
         country: studio.country || '',
         state: studio.state || '',
         city: studio.city || '',
-        zipcode: studio.zipcode || '',
-        paymentMode: studio.plan?.paymentMode || ''
+        zipcode: studio.zipcode || ''
       })
 
       setOpenEdit(true)
@@ -410,26 +446,47 @@ const StudioListTable = ({ studioData = [] }) => {
     }))
   }
 
+  // const handleUpdate = async () => {
+  //   if (!session?.accessToken) {
+  //     signOut({ callbackUrl: `/${locale}/login` })
+
+  //     return
+  //   }
+
+  //   try {
+  //     const result = await updateStudio(selectedStudio._id, formData, session.accessToken)
+
+  //     // setTableData(prev => prev.map(item => (item._id === selectedStudio._id ? { ...item, ...result.data } : item)))
+  //     setData(prev => prev.map(item => (item._id === selectedStudio._id ? { ...item, ...result.data } : item)))
+  //     showToast('Updated successfully', 'success')
+  //     setOpenEdit(false)
+  //     setSelectedStudio(null)
+
+  //     setTimeout(() => {
+  //       router.replace(`/${locale}/studio/list`)
+  //       router.refresh()
+  //     }, 2000)
+
+  //     // window.location.reload()
+  //   } catch (error) {
+  //     showToast(error.message || 'Update failed', 'error')
+  //   }
+  // }
   const handleUpdate = async () => {
     if (!session?.accessToken) {
-      return <AutoLogout />
+      signOut({ callbackUrl: `/${locale}/login` })
+
+      return
     }
 
     try {
       const result = await updateStudio(selectedStudio._id, formData, session.accessToken)
 
-      // setTableData(prev => prev.map(item => (item._id === selectedStudio._id ? { ...item, ...result.data } : item)))
       setData(prev => prev.map(item => (item._id === selectedStudio._id ? { ...item, ...result.data } : item)))
+
       showToast('Updated successfully', 'success')
       setOpenEdit(false)
       setSelectedStudio(null)
-
-      setTimeout(() => {
-        router.replace(`/${locale}/studio/list`)
-        router.refresh()
-      }, 2000)
-
-      // window.location.reload()
     } catch (error) {
       showToast(error.message || 'Update failed', 'error')
     }
@@ -437,14 +494,18 @@ const StudioListTable = ({ studioData = [] }) => {
 
   // 🔐 Auto logout if session expired
   if (status === 'unauthenticated') {
-    return <AutoLogout />
+    signOut({ callbackUrl: `/${locale}/login` })
+
+    return
 
     return null
   }
 
   const handleToggleStatus = async (studioId, currentStatus) => {
     if (!session?.accessToken) {
-      return <AutoLogout />
+      signOut({ callbackUrl: `/${locale}/login` })
+
+      return
     }
 
     const nextStatus = currentStatus !== 'active'
@@ -481,7 +542,9 @@ const StudioListTable = ({ studioData = [] }) => {
   // ---------- Delete ----------
   const handleDeleteStudio = async studioId => {
     if (!session?.accessToken) {
-      return <AutoLogout />
+      signOut({ callbackUrl: `/${locale}/login` })
+
+      return
     }
 
     try {
@@ -493,7 +556,9 @@ const StudioListTable = ({ studioData = [] }) => {
       })
 
       if (res.status === 401) {
-        return <AutoLogout />
+        signOut({ callbackUrl: `/${locale}/login` })
+
+        return
       }
 
       const result = await res.json()
