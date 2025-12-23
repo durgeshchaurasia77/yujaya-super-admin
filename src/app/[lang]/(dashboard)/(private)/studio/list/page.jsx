@@ -1,4 +1,4 @@
-import { useParams, useRouter, redirect } from 'next/navigation'
+import { useParams, redirect } from 'next/navigation'
 
 import { getServerSession } from 'next-auth'
 
