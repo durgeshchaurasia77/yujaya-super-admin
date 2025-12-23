@@ -486,15 +486,6 @@ const StudioInformation = ({ data, setData }) => {
               </CustomTextField>
             </Grid>
           )}
-          {/* <Grid size={{ xs: 12, sm: 6 }}>
-            <CustomTextField
-              fullWidth
-              label='Studio Name'
-              value={data?.studioName}
-              onChange={e => handleChange('studioName', e.target.value)}
-              placeholder='Name here...'
-            />
-          </Grid> */}
           {data.userType === 'studio' && (
             <Grid size={{ xs: 12, sm: 6 }}>
               <CustomTextField

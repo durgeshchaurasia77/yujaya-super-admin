@@ -79,9 +79,6 @@ const UserDropdown = () => {
       showToast('Logged out successfully', 'success')
     } catch (error) {
       console.error(error)
-
-      // Show above error in a toast like following
-      // toastService.error((err as Error).message)
     }
   }
 

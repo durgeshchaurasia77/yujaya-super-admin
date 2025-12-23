@@ -1,59 +1,48 @@
-// MUI Imports
 import { redirect } from 'next/navigation'
+
+import { getServerSession } from 'next-auth'
 
 import Grid from '@mui/material/Grid2'
 
-import { signOut } from 'next-auth/react'
-
-// import { redirect } from 'next/navigation'
-// Next Auth
-import { getServerSession } from 'next-auth'
-
 import { authOptions } from '@/libs/auth'
-
-// Components
 import StudioListTable from '@views/studio/list/StudioListTable'
-import StudioCard from '@views/studio/list/StudioCard'
+import AutoLogout from '@/components/AutoLogout'
 
 const eCommerceStudiosList = async () => {
   const session = await getServerSession(authOptions)
 
+  // 🔐 No session → redirect
   if (!session?.accessToken) {
-    signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+    return <AutoLogout />
   }
 
-  // console.log(session.accessToken)
+  let data = null
 
-  const res = await fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/studios`, {
-    headers: {
-      Authorization: `Bearer ${session.accessToken}`
-    },
-    cache: 'no-store'
-  })
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/studios`, {
+      headers: {
+        Authorization: `Bearer ${session.accessToken}`
+      },
+      cache: 'no-store'
+    })
 
-  // console.log(res)
-
-  if (!res.ok) {
+    // 🔐 Invalid token → redirect
     if (res.status === 406) {
-      signOut({ callbackUrl: process.env.NEXT_PUBLIC_APP_URL })
+      return <AutoLogout />
     }
 
-    const text = await res.text()
+    if (!res.ok) {
+      throw new Error('Failed to fetch studios')
+    }
 
-    console.error('API error:', text)
-    throw new Error('Failed to fetch studios')
+    data = await res.json()
+  } catch (error) {
+    return <AutoLogout />
   }
-
-  const data = await res.json()
 
   return (
     <Grid container spacing={6}>
-      {/* <Grid size={{ xs: 12 }}>
-        <StudioCard />
-      </Grid> */}
-
       <Grid size={{ xs: 12 }}>
-        {/* ✅ prop name FIXED */}
         <StudioListTable studioData={data?.studios ?? data} />
       </Grid>
     </Grid>

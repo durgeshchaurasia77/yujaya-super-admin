@@ -96,7 +96,7 @@ const HorizontalMenu = ({ dictionary }) => {
           <MenuItem href={`/${locale}/studio/list`}>Studio {dictionary['navigation'].list}</MenuItem>
         </SubMenu>
 
-        {/* <SubMenu label={dictionary['navigation'].apps} icon={<i className='tabler-mail' />}>
+        <SubMenu label={dictionary['navigation'].apps} icon={<i className='tabler-mail' />}>
           <SubMenu label={dictionary['navigation'].eCommerce} icon={<i className='tabler-shopping-cart' />}>
             <MenuItem href={`/${locale}/apps/ecommerce/dashboard`}>{dictionary['navigation'].dashboard}</MenuItem>
             <SubMenu label={dictionary['navigation'].products}>
@@ -182,7 +182,7 @@ const HorizontalMenu = ({ dictionary }) => {
             <MenuItem href={`/${locale}/apps/roles`}>{dictionary['navigation'].roles}</MenuItem>
             <MenuItem href={`/${locale}/apps/permissions`}>{dictionary['navigation'].permissions}</MenuItem>
           </SubMenu>
-        </SubMenu> */}
+        </SubMenu>
         {/* <SubMenu label={dictionary['navigation'].pages} icon={<i className='tabler-file' />}>
           <MenuItem href={`/${locale}/pages/user-profile`} icon={<i className='tabler-user-circle' />}>
             {dictionary['navigation'].userProfile}
