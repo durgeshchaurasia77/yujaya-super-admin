@@ -360,13 +360,17 @@ const StudioListTable = ({ studioData = [] }) => {
   const [selectedCountry, setSelectedCountry] = useState(countryCodes[0])
   const [openDropdown, setOpenDropdown] = useState(false)
 
+  const getSafeValue = (value, options, key = 'code') => {
+    return options.some(opt => opt[key] === value) ? value : ''
+  }
+
   // const handleEditOpen = async studioId => {
   //   try {
-  //     if (!session?.accessToken) {
-  //       signOut({ callbackUrl: `/${locale}/login` })
+  // if (!session?.accessToken) {
+  //   signOut({ callbackUrl: `/${locale}/login` })
 
-  //       return
-  //     }
+  //   return
+  // }
 
   //     const res = await getStudioById(studioId, session.accessToken)
 
@@ -405,17 +409,43 @@ const StudioListTable = ({ studioData = [] }) => {
   //   }
   // }
   const handleEditOpen = async studioId => {
-    if (!session?.accessToken) {
-      signOut({ callbackUrl: `/${locale}/login` })
-
-      return
-    }
-
     try {
+      if (!session?.accessToken) {
+        signOut({ callbackUrl: `/${locale}/login` })
+
+        return
+      }
+
       const res = await getStudioById(studioId, session.accessToken)
       const { studio, plan } = res.data
 
       setSelectedStudio({ ...studio, plan })
+
+      // 1️⃣ Country ke states preload
+      if (studio.country) {
+        const statesRes = await fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/states/${studio.country}`)
+
+        const statesData = await statesRes.json()
+
+        if (statesData.success) {
+          setStates(statesData.data)
+        }
+      }
+
+      // 2️⃣ State ke cities preload
+      if (studio.country && studio.state) {
+        const citiesRes = await fetch(
+          `${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/cities/${studio.country}/${studio.state}`
+        )
+
+        const citiesData = await citiesRes.json()
+
+        if (citiesData.success) {
+          setCities(citiesData.data)
+        }
+      }
+
+      // 3️⃣ Ab formData set karo (AFTER options)
       setFormData({
         userType: studio.userType || '',
         firstName: studio.firstName || '',
@@ -435,7 +465,7 @@ const StudioListTable = ({ studioData = [] }) => {
 
       setOpenEdit(true)
     } catch (error) {
-      showToast(error.message || 'Failed to load studio', 'error')
+      showToast('Failed to load studio', 'error')
     }
   }
 
@@ -970,7 +1000,7 @@ const StudioListTable = ({ studioData = [] }) => {
                   onChange={e => handleChange('address', e.target.value)}
                 />
               </Grid>
-              <Grid size={{ xs: 12, sm: 6 }}>
+              {/* <Grid size={{ xs: 12, sm: 6 }}>
                 <CustomTextField
                   select
                   fullWidth
@@ -998,9 +1028,39 @@ const StudioListTable = ({ studioData = [] }) => {
                     </MenuItem>
                   ))}
                 </CustomTextField>
-              </Grid>
+              </Grid> */}
               <Grid size={{ xs: 12, sm: 6 }}>
                 <CustomTextField
+                  select
+                  fullWidth
+                  label='Country'
+                  value={formData.country || ''}
+                  onChange={e => {
+                    const countryCode = e.target.value
+
+                    handleChange('country', countryCode)
+                    handleChange('state', '')
+                    handleChange('city', '')
+
+                    setStates([])
+                    setCities([])
+
+                    fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/states/${countryCode}`)
+                      .then(res => res.json())
+                      .then(res => {
+                        if (res.success) setStates(res.data)
+                      })
+                  }}
+                >
+                  {countries.map(country => (
+                    <MenuItem key={country.code} value={country.code}>
+                      {country.name}
+                    </MenuItem>
+                  ))}
+                </CustomTextField>
+              </Grid>
+              <Grid size={{ xs: 12, sm: 6 }}>
+                {/* <CustomTextField
                   select
                   fullWidth
                   label='State'
@@ -1024,15 +1084,54 @@ const StudioListTable = ({ studioData = [] }) => {
                       {state.name}
                     </MenuItem>
                   ))}
+                </CustomTextField> */}
+                <CustomTextField
+                  select
+                  fullWidth
+                  label='State'
+                  value={getSafeValue(formData.state, states, 'code')}
+                  disabled={!states.length}
+                  onChange={e => {
+                    const stateCode = e.target.value
+
+                    handleChange('state', stateCode)
+                    handleChange('city', '')
+
+                    fetch(`${process.env.NEXT_PUBLIC_SUPER_ADMIN_API_URL}/cities/${formData.country}/${stateCode}`)
+                      .then(res => res.json())
+                      .then(res => {
+                        if (res.success) setCities(res.data)
+                      })
+                  }}
+                >
+                  {states.map(state => (
+                    <MenuItem key={state.code} value={state.code}>
+                      {state.name}
+                    </MenuItem>
+                  ))}
                 </CustomTextField>
               </Grid>
 
               <Grid size={{ xs: 12, sm: 6 }}>
-                <CustomTextField
+                {/* <CustomTextField
                   select
                   fullWidth
                   label='City'
                   value={formData.city}
+                  disabled={!cities.length}
+                  onChange={e => handleChange('city', e.target.value)}
+                >
+                  {cities.map(city => (
+                    <MenuItem key={city.name} value={city.name}>
+                      {city.name}
+                    </MenuItem>
+                  ))}
+                </CustomTextField> */}
+                <CustomTextField
+                  select
+                  fullWidth
+                  label='City'
+                  value={getSafeValue(formData.city, cities, 'name')}
                   disabled={!cities.length}
                   onChange={e => handleChange('city', e.target.value)}
                 >

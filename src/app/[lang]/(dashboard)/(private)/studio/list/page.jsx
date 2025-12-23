@@ -1,4 +1,4 @@
-import { useParams, redirect } from 'next/navigation'
+import { redirect } from 'next/navigation'
 
 import { getServerSession } from 'next-auth'
 
@@ -10,13 +10,10 @@ import AutoLogout from '@/components/AutoLogout'
 
 const eCommerceStudiosList = async () => {
   const session = await getServerSession(authOptions)
-  const { lang: locale } = useParams()
 
   // 🔐 No session → redirect
   if (!session?.accessToken) {
-    signOut({ callbackUrl: `/${locale}/login` })
-
-    return
+    return <AutoLogout />
   }
 
   let data = null
@@ -31,9 +28,7 @@ const eCommerceStudiosList = async () => {
 
     // 🔐 Invalid token → redirect
     if (res.status === 406) {
-      signOut({ callbackUrl: `/${locale}/login` })
-
-      return
+      return <AutoLogout />
     }
 
     if (!res.ok) {
@@ -42,9 +37,7 @@ const eCommerceStudiosList = async () => {
 
     data = await res.json()
   } catch (error) {
-    signOut({ callbackUrl: `/${locale}/login` })
-
-    return
+    return <AutoLogout />
   }
 
   return (
